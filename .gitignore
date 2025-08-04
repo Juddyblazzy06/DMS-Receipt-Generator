@@ -14,6 +14,14 @@ client/dist/
 .env.development.local
 .env.test.local
 .env.production.local
+server/config.env
+server/config.env.local
+server/config.env.development.local
+server/config.env.test.local
+server/config.env.production.local
+server/config.env.development
+server/config.env.test
+server/config.env.production
 
 # Logs
 logs
