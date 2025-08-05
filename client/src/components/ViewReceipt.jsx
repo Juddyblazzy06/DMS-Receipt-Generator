@@ -28,21 +28,38 @@ const ViewReceipt = () => {
     }
   };
 
-  const handleDownloadPDF = async () => {
+  const handleDownloadReceipt = async () => {
     try {
       const response = await receiptAPI.downloadPDF(id);
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `receipt-${receipt.studentID}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      
+      // Check if it's HTML content
+      const contentType = response.headers['content-type'];
+      if (contentType && contentType.includes('text/html')) {
+        // Handle HTML download
+        const blob = new Blob([response.data], { type: 'text/html' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `receipt-${receipt.receiptNumber}.html`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        // Handle PDF download
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `receipt-${receipt.receiptNumber}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }
     } catch (err) {
-      setError('Failed to download PDF');
-      console.error('Error downloading PDF:', err);
+      setError('Failed to download receipt');
+      console.error('Error downloading receipt:', err);
     }
   };
 
@@ -91,8 +108,8 @@ const ViewReceipt = () => {
             <button onClick={handlePrint} className="btn btn-secondary">
               Print
             </button>
-            <button onClick={handleDownloadPDF} className="btn btn-success">
-              Download PDF
+            <button onClick={handleDownloadReceipt} className="btn btn-success">
+              Download Receipt
             </button>
             <button onClick={() => navigate('/')} className="btn btn-primary">
               Back to List
@@ -155,10 +172,10 @@ const ViewReceipt = () => {
           </h3>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
             <div>
-              <strong>Student Name:</strong> {receipt.studentName}
+              <strong>Receipt Number:</strong> {receipt.receiptNumber?.toString().padStart(4, '0')}
             </div>
             <div>
-              <strong>Student ID:</strong> {receipt.studentID}
+              <strong>Student Name:</strong> {receipt.studentName}
             </div>
             <div>
               <strong>Class Level:</strong> {receipt.classLevel}

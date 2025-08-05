@@ -1,26 +1,17 @@
-const htmlPdf = require('html-pdf-node');
 const { formatNaira, formatDate } = require('./formatters');
 
 const generatePDF = async (receipt) => {
   try {
-    // Generate HTML content that matches the UI
+    // Generate HTML content
     const htmlContent = generateReceiptHTML(receipt);
     
-    // Generate PDF using html-pdf-node
-    const pdfBuffer = await htmlPdf.generatePdf({
-      content: htmlContent
-    }, {
-      format: 'A4',
-      margin: {
-        top: '20mm',
-        right: '20mm',
-        bottom: '20mm',
-        left: '20mm'
-      },
-      printBackground: true
-    });
-    
-    return pdfBuffer;
+    // For now, return HTML content that can be converted to PDF on the client side
+    // This avoids heavy server-side dependencies
+    return {
+      type: 'html',
+      content: htmlContent,
+      filename: `receipt-${receipt.receiptNumber}.html`
+    };
   } catch (error) {
     console.error('PDF generation error:', error);
     throw error;
@@ -29,8 +20,8 @@ const generatePDF = async (receipt) => {
 
 const generateReceiptHTML = (receipt) => {
   const {
+    receiptNumber,
     studentName,
-    studentID,
     classLevel,
     term,
     session,
@@ -188,9 +179,34 @@ const generateReceiptHTML = (receipt) => {
             color-adjust: exact;
           }
         }
+        
+        .print-button {
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          padding: 10px 20px;
+          background: ${primaryColor};
+          color: white;
+          border: none;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 14px;
+        }
+        
+        .print-button:hover {
+          opacity: 0.8;
+        }
+        
+        @media print {
+          .print-button {
+            display: none;
+          }
+        }
       </style>
     </head>
     <body>
+      <button class="print-button" onclick="window.print()">Print Receipt</button>
+      
       <div class="receipt-container">
         <!-- Header -->
         <div class="header">
@@ -204,12 +220,12 @@ const generateReceiptHTML = (receipt) => {
           <h2 class="section-title">STUDENT INFORMATION</h2>
           <div class="info-grid">
             <div class="info-item">
-              <span class="info-label">Student Name:</span>
-              <span class="info-value">${studentName}</span>
+              <span class="info-label">Receipt Number:</span>
+              <span class="info-value">${receiptNumber.toString().padStart(4, '0')}</span>
             </div>
             <div class="info-item">
-              <span class="info-label">Student ID:</span>
-              <span class="info-value">${studentID}</span>
+              <span class="info-label">Student Name:</span>
+              <span class="info-value">${studentName}</span>
             </div>
             <div class="info-item">
               <span class="info-label">Class Level:</span>
@@ -268,4 +284,4 @@ const generateReceiptHTML = (receipt) => {
   `;
 };
 
-module.exports = { generatePDF };
+module.exports = { generatePDF }; 

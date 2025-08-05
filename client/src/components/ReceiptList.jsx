@@ -38,21 +38,38 @@ const ReceiptList = () => {
     }
   };
 
-  const handleDownloadPDF = async (id) => {
+  const handleDownloadReceipt = async (id) => {
     try {
       const response = await receiptAPI.downloadPDF(id);
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `receipt-${id}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      
+      // Check if it's HTML content
+      const contentType = response.headers['content-type'];
+      if (contentType && contentType.includes('text/html')) {
+        // Handle HTML download
+        const blob = new Blob([response.data], { type: 'text/html' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `receipt-${id}.html`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      } else {
+        // Handle PDF download
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `receipt-${id}.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(url);
+      }
     } catch (err) {
-      setError('Failed to download PDF');
-      console.error('Error downloading PDF:', err);
+      setError('Failed to download receipt');
+      console.error('Error downloading receipt:', err);
     }
   };
 
@@ -101,8 +118,8 @@ const ReceiptList = () => {
           <table className="table">
             <thead>
               <tr>
+                <th>Receipt #</th>
                 <th>Student Name</th>
-                <th>Student ID</th>
                 <th>Class</th>
                 <th>Term</th>
                 <th>Session</th>
@@ -114,8 +131,10 @@ const ReceiptList = () => {
             <tbody>
               {receipts.map((receipt) => (
                 <tr key={receipt._id}>
+                  <td>
+                    <strong>{receipt.receiptNumber?.toString().padStart(4, '0') || 'N/A'}</strong>
+                  </td>
                   <td>{receipt.studentName}</td>
-                  <td>{receipt.studentID}</td>
                   <td>{receipt.classLevel}</td>
                   <td>{receipt.term}</td>
                   <td>{receipt.session}</td>
@@ -138,11 +157,12 @@ const ReceiptList = () => {
                         Edit
                       </Link>
                       <button
-                        onClick={() => handleDownloadPDF(receipt._id)}
+                        onClick={() => handleDownloadReceipt(receipt._id)}
                         className="btn btn-success"
                         style={{ padding: '5px 10px', fontSize: '12px' }}
+                        title="Download printable receipt"
                       >
-                        PDF
+                        Print
                       </button>
                       <button
                         onClick={() => handleDelete(receipt._id)}

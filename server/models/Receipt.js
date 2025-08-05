@@ -6,8 +6,12 @@ const feeItemSchema = new mongoose.Schema({
 });
 
 const receiptSchema = new mongoose.Schema({
+  receiptNumber: { 
+    type: Number, 
+    required: true,
+    unique: true
+  },
   studentName: { type: String, required: true },
-  studentID: { type: String, required: true },
   classLevel: {
     type: String,
     required: true,
@@ -29,5 +33,28 @@ const receiptSchema = new mongoose.Schema({
   },
   createdAt: { type: Date, default: Date.now }
 });
+
+// Static method to get next receipt number
+receiptSchema.statics.getNextReceiptNumber = async function() {
+  try {
+    const lastReceipt = await this.findOne().sort({ receiptNumber: -1 });
+    
+    if (!lastReceipt || !lastReceipt.receiptNumber) {
+      return 1001; // Start from 1001 for 4-digit format
+    }
+    
+    const nextNumber = lastReceipt.receiptNumber + 1;
+    
+    // Ensure it's a valid number
+    if (isNaN(nextNumber) || nextNumber < 1001) {
+      return 1001;
+    }
+    
+    return nextNumber;
+  } catch (error) {
+    console.error('Error getting next receipt number:', error);
+    return 1001; // Fallback to 1001
+  }
+};
 
 module.exports = mongoose.model("Receipt", receiptSchema); 

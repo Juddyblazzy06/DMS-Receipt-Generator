@@ -4,7 +4,6 @@ import { calculateTotal } from '../utils/formatters';
 const ReceiptForm = ({ receipt, onSubmit, isEditing = false }) => {
   const [formData, setFormData] = useState({
     studentName: '',
-    studentID: '',
     classLevel: '',
     term: '',
     session: '',
@@ -23,7 +22,6 @@ const ReceiptForm = ({ receipt, onSubmit, isEditing = false }) => {
     if (receipt) {
       setFormData({
         studentName: receipt.studentName || '',
-        studentID: receipt.studentID || '',
         classLevel: receipt.classLevel || '',
         term: receipt.term || '',
         session: receipt.session || '',
@@ -89,7 +87,6 @@ const ReceiptForm = ({ receipt, onSubmit, isEditing = false }) => {
     const newErrors = {};
 
     if (!formData.studentName.trim()) newErrors.studentName = 'Student name is required';
-    if (!formData.studentID.trim()) newErrors.studentID = 'Student ID is required';
     if (!formData.classLevel) newErrors.classLevel = 'Class level is required';
     if (!formData.term) newErrors.term = 'Term is required';
     if (!formData.session.trim()) newErrors.session = 'Session is required';
@@ -140,19 +137,6 @@ const ReceiptForm = ({ receipt, onSubmit, isEditing = false }) => {
             placeholder="Enter student name"
           />
           {errors.studentName && <div className="alert alert-danger">{errors.studentName}</div>}
-        </div>
-
-        <div className="form-group">
-          <label className="form-label">Student ID *</label>
-          <input
-            type="text"
-            name="studentID"
-            value={formData.studentID}
-            onChange={handleInputChange}
-            className={`form-control ${errors.studentID ? 'border-danger' : ''}`}
-            placeholder="Enter student ID"
-          />
-          {errors.studentID && <div className="alert alert-danger">{errors.studentID}</div>}
         </div>
 
         <div className="form-group">
@@ -368,8 +352,8 @@ const ReceiptForm = ({ receipt, onSubmit, isEditing = false }) => {
                 STUDENT INFORMATION
               </h3>
               <div style={{ fontSize: '12px' }}>
+                <div><strong>Receipt Number:</strong> {receipt?.receiptNumber?.toString().padStart(4, '0') || '1001'}</div>
                 <div><strong>Student Name:</strong> {formData.studentName}</div>
-                <div><strong>Student ID:</strong> {formData.studentID}</div>
                 <div><strong>Class Level:</strong> {formData.classLevel}</div>
                 <div><strong>Term:</strong> {formData.term}</div>
                 <div><strong>Session:</strong> {formData.session}</div>
