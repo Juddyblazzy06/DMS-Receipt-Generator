@@ -16,24 +16,25 @@ jobs:
       contents: read #This is required for actions/checkout
 
     steps:
-      - uses: actions/checkout@v4
+  - uses: actions/checkout@v4
 
-      - name: Set up Node.js version
-        uses: actions/setup-node@v3
-        with:
-          node-version: '22.x'
+  - name: Set up Node.js version
+    uses: actions/setup-node@v3
+    with:
+      node-version: '22.x'
 
-      - name: npm install, build, and test
-        run: |
-          npm install
-          npm run build --if-present
-          npm run test --if-present
+  - name: npm install, build, and test (in server folder)
+    working-directory: server
+    run: |
+      npm install
+      npm run build --if-present
+      npm run test --if-present
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4
-        with:
-          name: node-app
-          path: .
+  - name: Upload artifact from server
+    uses: actions/upload-artifact@v4
+    with:
+      name: node-app
+      path: server
 
   deploy:
     runs-on: ubuntu-latest
@@ -43,23 +44,25 @@ jobs:
       contents: read #This is required for actions/checkout
 
     steps:
-      - name: Download artifact from build job
-        uses: actions/download-artifact@v4
-        with:
-          name: node-app
-      
-      - name: Login to Azure
-        uses: azure/login@v2
-        with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_04AF56D6B9B74F97885F4D18BEAC3D3B }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_20FF4E4182684490846D0343CA327C93 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E4033CBC4DA6422FBAE6A0EE7E6BA374 }}
+  - name: Download artifact from build job
+    uses: actions/download-artifact@v4
+    with:
+      name: node-app
 
-      - name: 'Deploy to Azure Web App'
-        id: deploy-to-webapp
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: 'Receipt-Generator-Backend'
-          slot-name: 'Production'
-          package: .
+  - name: Login to Azure
+    uses: azure/login@v2
+    with:
+      client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_04AF56D6B9B74F97885F4D18BEAC3D3B }}
+      tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_20FF4E4182684490846D0343CA327C93 }}
+      subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_E4033CBC4DA6422FBAE6A0EE7E6BA374 }}
+
+  - name: Deploy to Azure Web App
+    id: deploy-to-webapp
+    uses: azure/webapps-deploy@v3
+    with:
+      app-name: 'Receipt-Generator-Backend'
+      slot-name: 'Production'
+      package: .
+
+
           
