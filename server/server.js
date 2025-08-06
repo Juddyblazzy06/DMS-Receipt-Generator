@@ -10,9 +10,10 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://dms-receipt-generator-1.onrender.com', 'https://dms-receipt-generator.vercel.app']
-    : 'http://localhost:3000',
+  origin: '*',
+  // origin: process.env.NODE_ENV === 'production' 
+  //   ? ['https://dms-receipt-generator-1.onrender.com', 'https://dms-receipt-generator.vercel.app']
+  //   : 'http://localhost:3000',
   credentials: true
 }));
 app.use(express.json());
