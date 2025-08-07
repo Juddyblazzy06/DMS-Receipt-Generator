@@ -253,7 +253,7 @@ const generateReceiptHTML = (receipt) => {
             <thead>
               <tr>
                 <th>Item</th>
-                <th class="amount">Amount (₦)</th>
+                <th class="amount" style="text-align: right;">Amount (₦)</th>
               </tr>
             </thead>
             <tbody>
