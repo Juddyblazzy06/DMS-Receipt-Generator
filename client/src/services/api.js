@@ -1,5 +1,5 @@
 import axios from 'axios';
-const BACKEND_URL= 'https://dms-receipt-generator-production.up.railway.app/api';
+const BACKEND_URL= 'https://receipt-gen-dqhubzbab2d6hbgj.southafricanorth-01.azurewebsites.net/' ||'https://dms-receipt-generator-production.up.railway.app/api';
 
 const API_BASE_URL = BACKEND_URL || 'http://localhost:5000/api';
 
