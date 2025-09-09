@@ -10,7 +10,7 @@ const ReceiptForm = ({ receipt, onSubmit, isEditing = false }) => {
     paymentMethod: '',
     feeItems: [{ title: '', amount: '' }],
     receiptStyle: {
-      logoUrl: '',
+      logoUrl: 'https://shorturl.at/G9o8x', // default logo
       primaryColor: '#000000',
       footerNote: ''
     }
